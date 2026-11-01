@@ -7,6 +7,14 @@
   var state = { candidates: [], selected: null, draft: null };
   var $ = function(id) { return document.getElementById(id); };
 
+  // 進み具合の表示(1: 事業のこと / 2: 制度をえらぶ / 3: 下書き)
+  function setStep(n) {
+    document.querySelectorAll('#stepper li').forEach(function(li, i) {
+      li.classList.toggle('active', i + 1 === n);
+      li.classList.toggle('done', i + 1 < n);
+    });
+  }
+
   function readProfile() {
     var profile = {};
     FIELDS.forEach(function(key) { profile[key] = $(key).value.trim(); });
@@ -57,6 +65,7 @@
       $('search-status').textContent = '';
       $('step3').hidden = true;
       $('step2').hidden = false;
+      setStep(2);
       $('step2').scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (e) {
       setStatus($('search-status'), e.message, true);
@@ -66,7 +75,7 @@
   }
 
   function renderCandidates(data) {
-    $('checked-at').textContent = '調べた日: ' + (data.checked_at || '') + '  /  ' + state.candidates.length + '件';
+    $('checked-at').textContent = state.candidates.length + '件 ・ 調べた日 ' + (data.checked_at || '');
     if (!state.candidates.length) {
       $('candidates').innerHTML = '<p>合いそうな制度が見つかりませんでした。「やりたいこと」を具体的にして、もう一度お試しください。</p>';
     } else {
@@ -84,12 +93,12 @@
           + '</div>'
           + '<h3>' + escapeHtml(c.name) + '</h3>'
           + '<p>' + escapeHtml(c.summary) + '</p>'
+          + '<div class="fit"><b>あなたに合う理由</b>' + escapeHtml(c.fit_reason) + '</div>'
           + '<dl>'
-          + '<dt>実施主体</dt><dd>' + escapeHtml(c.provider) + '</dd>'
-          + '<dt>合う理由</dt><dd>' + escapeHtml(c.fit_reason) + '</dd>'
-          + '<dt>金額・補助率</dt><dd>' + escapeHtml(c.amount) + '</dd>'
-          + '<dt>公募期間</dt><dd>' + escapeHtml(c.schedule) + '</dd>'
-          + '<dt>注意点</dt><dd>' + escapeHtml(c.cautions) + '</dd>'
+          + '<div><dt>金額・補助率</dt><dd>' + escapeHtml(c.amount) + '</dd></div>'
+          + '<div><dt>公募期間</dt><dd>' + escapeHtml(c.schedule) + '</dd></div>'
+          + '<div><dt>実施主体</dt><dd>' + escapeHtml(c.provider) + '</dd></div>'
+          + '<div class="wide"><dt>注意点</dt><dd>' + escapeHtml(c.cautions) + '</dd></div>'
           + '</dl>'
           + '<div class="actions"><button type="button" class="draft-btn" data-index="' + i + '">この制度で申請書の下書きを作る</button>' + link + '</div>'
           + '</article>';
@@ -97,7 +106,7 @@
     }
     var notes = data.notes || [];
     $('notes').innerHTML = notes.length
-      ? '<h3 style="margin-top:1.5rem">補足</h3><ul class="plain">' + notes.map(function(n) { return '<li>' + escapeHtml(n) + '</li>'; }).join('') + '</ul>'
+      ? '<div class="draft-section"><h3>補足</h3><ul class="plain">' + notes.map(function(n) { return '<li>' + escapeHtml(n) + '</li>'; }).join('') + '</ul></div>'
       : '';
   }
 
@@ -105,6 +114,7 @@
   async function draft(answers) {
     var program = state.selected;
     $('step3').hidden = false;
+    setStep(3);
     $('draft-for').textContent = '対象の制度: ' + program.name;
     $('draft').innerHTML = '';
     $('step3').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -185,6 +195,7 @@
     state = { candidates: [], selected: null, draft: null };
     $('step2').hidden = true;
     $('step3').hidden = true;
+    setStep(1);
     $('saved-msg').hidden = true;
     $('search-status').textContent = '';
     $('business_type').focus();
