@@ -55,7 +55,7 @@ formspree.io に support@cocofree.jp で登録してフォームを作り、そ�
 
 ## 費用と上限
 
-- モデルは `claude-opus-5-5`(effort: medium)。制度検索は最大6回、下書きは最大4回の Web 検索を使う
+- モデルは `claude-opus-5-5`(effort: medium)。制度検索は最大12回、下書きは最大4回の Web 検索を使う
 - 1回の実行で、トークン代と Web 検索代を合わせて数十円程度の見込み(検索結果の量で変動)
 - 同じIPから1分あたり3回まで(`wrangler.toml` の `ratelimits`)。Anthropic Console 側で月の利用上限(Spend limit)も設定しておくこと
 

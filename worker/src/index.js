@@ -101,6 +101,7 @@ const SEARCH_SYSTEM = `あなたは中小企業・個人事業主の補助金・
 
 ## 進め方
 - まず事業者のやりたいことに合う制度の種類(販路開拓、IT・DX、設備投資、省力化、雇用・人材育成、賃上げ、創業 など)を考え、検索する。
+- 検索は最大12回。国の制度に4〜5回、岡山県に2〜3回、所在地の市町村に2〜3回を目安に配分し、1つの制度を深追いしすぎない。候補は3件以上を目指す。
 - 国の主要制度に加えて、岡山県の制度と、所在地の市町村の公式サイトを必ずそれぞれ1回以上検索する(市町村名を検索語に含める)。所在地の市町村に合う独自制度が無ければ、notes にその旨を書く。
 - 今日の日付を基準に、公募中・公募予定のものを優先する。終了した制度は、次回公募が見込まれる場合のみ「終了」として含める。
 - 制度名、補助額、補助率、締切は、検索結果で確認できたものだけを書く。確認できない値を推測で埋めない。
@@ -248,7 +249,7 @@ async function callClaude(env, system, userContent, maxSearches, toolName, toolD
 
 async function searchPrograms(env, body) {
   const userContent = '今日の日付: ' + todayJst() + '\n\n<business_profile>\n' + buildProfileText(body.profile) + '\n</business_profile>';
-  const out = await callClaude(env, SEARCH_SYSTEM, userContent, 6, 'submit_candidates', '調べた補助金・助成金の候補を提出する', CANDIDATES_SCHEMA);
+  const out = await callClaude(env, SEARCH_SYSTEM, userContent, 12, 'submit_candidates', '調べた補助金・助成金の候補を提出する', CANDIDATES_SCHEMA);
 
   const candidates = (out.result.candidates || []).slice(0, 8).map(function(c) {
     const verified = !!c.url && out.urls.has(c.url);
