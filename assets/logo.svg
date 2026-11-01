@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="440 360 1180 1180" role="img" aria-label="おかやま補助金・助成金AI">
+  <defs>
+    <mask id="slit" maskUnits="userSpaceOnUse" x="440" y="360" width="1180" height="1180">
+      <rect x="440" y="360" width="1180" height="1180" fill="#fff"/>
+      <path d="M618 1357 Q1134 898 1594 382 Q1078 841 618 1357 Z" fill="#000"/>
+    </mask>
+  </defs>
+  <g fill="#000" mask="url(#slit)">
+    <circle cx="969" cy="1000" r="505"/>
+    <path d="M1594 381 L1474 724 Q1462 752 1432 776 L1300 700 L1188 551 Q1210 515 1246 500 Z"/>
+  </g>
+</svg>
