@@ -1,0 +1,17 @@
+name = "okayama-hojokin-ai"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+[observability]
+enabled = true
+
+# ANTHROPIC_API_KEY はここに書かず、`wrangler secret put ANTHROPIC_API_KEY` で登録します。
+
+# 同じIPからの実行を1分あたり3回までに制限(費用の暴走防止)
+[[ratelimits]]
+name = "LIMITER"
+namespace_id = "3001"
+
+  [ratelimits.simple]
+  limit = 3
+  period = 60

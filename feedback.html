@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ご意見・不具合の報告 | おかやま補助金・助成金AI</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="brand" href="index.html">おかやま補助金・助成金AI</a>
+    <nav class="nav">
+      <a href="index.html">制度をさがす</a>
+      <a href="feedback.html" aria-current="page">ご意見・不具合</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>ご意見・不具合の報告</h1>
+  <p class="lead">使ってみた感想や、うまく動かなかった点を教えてください。いただいた内容は運営者(COCOFREE)に届き、改善に使います。</p>
+
+  <section class="card">
+    <form id="feedback-form" class="grid" novalidate>
+      <div>
+        <label for="kind">種類</label>
+        <select id="kind" name="kind">
+          <option>感想・要望</option>
+          <option>不具合の報告</option>
+          <option>制度の情報が違っていた</option>
+          <option>その他</option>
+        </select>
+      </div>
+      <div>
+        <label for="role">お立場</label>
+        <select id="role" name="role">
+          <option>事業者</option>
+          <option>支援者(商工会・士業など)</option>
+          <option>その他</option>
+        </select>
+      </div>
+      <div class="full">
+        <label for="message">内容(必須)</label>
+        <textarea id="message" name="message" maxlength="3000" placeholder="例: 「制度の候補」で、締切が過ぎた制度が公募中と表示されていました。"></textarea>
+        <p class="hint">不具合の場合は、どの画面で、何をしたときに起きたかを書いていただけると助かります。</p>
+      </div>
+      <div class="full">
+        <label for="email">返信先のメールアドレス(任意)</label>
+        <input type="text" id="email" name="email" inputmode="email" autocomplete="email" placeholder="返信が必要な場合のみ">
+      </div>
+      <!-- ボット対策(人には見えない) -->
+      <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
+    </form>
+    <div class="actions">
+      <button type="button" id="send-btn">送信する</button>
+    </div>
+    <div id="feedback-status" class="status" role="status"></div>
+  </section>
+
+  <p class="hint">フォームが使えない場合は <a href="mailto:support@cocofree.jp">support@cocofree.jp</a> へメールでお送りください。</p>
+</main>
+
+<script src="config.js"></script>
+<script src="assets/common.js"></script>
+<script src="assets/feedback.js"></script>
+</body>
+</html>

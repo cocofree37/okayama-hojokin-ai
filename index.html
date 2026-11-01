@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>おかやま補助金・助成金AI</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="inner">
+    <a class="brand" href="index.html">おかやま補助金・助成金AI</a>
+    <nav class="nav">
+      <a href="feedback.html">ご意見・不具合</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>おかやま補助金・助成金AI</h1>
+  <p class="lead">事業のことを入力すると、使えそうな国・岡山県・市町村の制度を公式サイトから探し、申請書の下書きまで作ります。</p>
+
+  <div id="demo-banner" class="demo-banner" hidden>
+    デモ表示中です(AI未接続)。結果は画面の動きを見るための表示例で、実在の制度の最新情報ではありません。
+  </div>
+
+  <div class="notice">
+    ご利用前にお読みください
+    <ul>
+      <li>制度の内容や締切は変わります。申請前に必ず公式の公募要領で確認してください。</li>
+      <li>このツールは下書きの支援です。申請の代行や、採択・受給の保証はしません。</li>
+      <li>入力内容は、結果の作成のために AI(Anthropic社のAPI)へ送信されます。個人名や口座番号などは入力しないでください。</li>
+    </ul>
+  </div>
+
+  <!-- STEP 1 -->
+  <section class="card" aria-labelledby="step1-title">
+    <div class="step-label">STEP 1</div>
+    <h2 id="step1-title">事業者プロフィール</h2>
+    <form id="profile-form" class="grid">
+      <div>
+        <label for="business_type">業種</label>
+        <input type="text" id="business_type" name="business_type" placeholder="例: 飲食店(カフェ)">
+      </div>
+      <div>
+        <label for="form">事業形態</label>
+        <select id="form" name="form">
+          <option value="">選択してください</option>
+          <option>個人事業主</option>
+          <option>法人(株式会社・合同会社など)</option>
+          <option>創業予定</option>
+          <option>NPO・その他</option>
+        </select>
+      </div>
+      <div>
+        <label for="location">所在地(市町村まで)</label>
+        <input type="text" id="location" name="location" placeholder="例: 岡山県岡山市北区">
+      </div>
+      <div>
+        <label for="employees">従業員数(本人を除く)</label>
+        <input type="text" id="employees" name="employees" placeholder="例: パート2名">
+      </div>
+      <div class="full">
+        <label for="business">事業内容</label>
+        <textarea id="business" name="business" placeholder="例: 岡山駅近くで、地元の白桃やマスカットを使ったスイーツと珈琲のカフェを経営。客席20席、売上の8割が店内飲食。"></textarea>
+      </div>
+      <div class="full">
+        <label for="plan">やりたいこと・投資の予定</label>
+        <textarea id="plan" name="plan" placeholder="例: 焼き菓子のネット販売を始めたい。ECサイトの制作と、包装機の購入を考えている。"></textarea>
+        <p class="hint">「何に、なぜお金を使いたいか」が具体的なほど、合う制度が見つかりやすくなります。</p>
+      </div>
+      <div>
+        <label for="budget">予定金額(だいたいで可)</label>
+        <input type="text" id="budget" name="budget" placeholder="例: 150万円くらい">
+      </div>
+      <div>
+        <label for="timing">実施したい時期</label>
+        <input type="text" id="timing" name="timing" placeholder="例: 2027年春までに">
+      </div>
+    </form>
+    <div class="actions">
+      <button type="button" id="search-btn">使えそうな制度を探す</button>
+      <button type="button" class="secondary" id="clear-btn">入力をクリア</button>
+      <span id="saved-msg" class="saved" hidden>プロフィールを保存しました(この端末のみ)</span>
+    </div>
+    <div id="search-status" class="status" role="status"></div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="card" id="step2" aria-labelledby="step2-title" hidden>
+    <div class="step-label">STEP 2</div>
+    <h2 id="step2-title">使えそうな制度の候補</h2>
+    <p class="hint" id="checked-at"></p>
+    <div id="candidates"></div>
+    <div id="notes"></div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="card" id="step3" aria-labelledby="step3-title" hidden>
+    <div class="step-label">STEP 3</div>
+    <h2 id="step3-title">申請書の下書き</h2>
+    <p class="hint" id="draft-for"></p>
+    <div id="draft-status" class="status" role="status"></div>
+    <div id="draft"></div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  相談窓口の例: 岡山県よろず支援拠点、商工会議所・商工会、取引のある金融機関。申請書は専門家に見てもらうと採択率が上がります。
+</footer>
+
+<script src="config.js"></script>
+<script src="assets/common.js"></script>
+<script src="assets/hojokin-demo.js"></script>
+<script src="assets/hojokin.js"></script>
+</body>
+</html>
