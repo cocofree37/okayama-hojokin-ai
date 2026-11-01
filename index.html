@@ -47,7 +47,28 @@
     <form id="profile-form" class="grid">
       <div>
         <label for="business_type">業種</label>
-        <input type="text" id="business_type" name="business_type" placeholder="例: 飲食店(カフェ)">
+        <select id="business_type" name="business_type">
+          <option value="">選択してください</option>
+          <option>飲食店</option>
+          <option>小売業(店舗)</option>
+          <option>ネット通販・EC</option>
+          <option>食品製造(菓子・加工品など)</option>
+          <option>製造業(食品以外)</option>
+          <option>卸売業</option>
+          <option>建設業・工務店</option>
+          <option>宿泊業・観光</option>
+          <option>美容・理容・エステ</option>
+          <option>医療・福祉・介護</option>
+          <option>農業・林業・漁業</option>
+          <option>運輸・物流</option>
+          <option>不動産業</option>
+          <option>教育・学習支援</option>
+          <option>IT・情報通信・Web制作</option>
+          <option>専門サービス(士業・コンサルなど)</option>
+          <option>生活関連サービス(クリーニング・修理など)</option>
+          <option value="その他">その他(自由に入力)</option>
+        </select>
+        <input type="text" id="business_type_other" placeholder="例: ペットトリミング" aria-label="業種(その他)" hidden style="margin-top:0.6rem">
       </div>
       <div>
         <label for="form">事業形態</label>
@@ -61,7 +82,40 @@
       </div>
       <div>
         <label for="location">所在地(市町村まで)</label>
-        <input type="text" id="location" name="location" placeholder="例: 岡山県岡山市北区">
+        <select id="location" name="location">
+          <optgroup label="市">
+            <option value="岡山県岡山市">岡山市</option>
+            <option value="岡山県倉敷市">倉敷市</option>
+            <option value="岡山県津山市">津山市</option>
+            <option value="岡山県玉野市">玉野市</option>
+            <option value="岡山県笠岡市">笠岡市</option>
+            <option value="岡山県井原市">井原市</option>
+            <option value="岡山県総社市">総社市</option>
+            <option value="岡山県高梁市">高梁市</option>
+            <option value="岡山県新見市">新見市</option>
+            <option value="岡山県備前市">備前市</option>
+            <option value="岡山県瀬戸内市">瀬戸内市</option>
+            <option value="岡山県赤磐市">赤磐市</option>
+            <option value="岡山県真庭市">真庭市</option>
+            <option value="岡山県美作市">美作市</option>
+            <option value="岡山県浅口市">浅口市</option>
+          </optgroup>
+          <optgroup label="町村">
+            <option value="岡山県和気町">和気町</option>
+            <option value="岡山県早島町">早島町</option>
+            <option value="岡山県里庄町">里庄町</option>
+            <option value="岡山県矢掛町">矢掛町</option>
+            <option value="岡山県新庄村">新庄村</option>
+            <option value="岡山県鏡野町">鏡野町</option>
+            <option value="岡山県勝央町">勝央町</option>
+            <option value="岡山県奈義町">奈義町</option>
+            <option value="岡山県西粟倉村">西粟倉村</option>
+            <option value="岡山県久米南町">久米南町</option>
+            <option value="岡山県美咲町">美咲町</option>
+            <option value="岡山県吉備中央町">吉備中央町</option>
+          </optgroup>
+          <option value="岡山県外">岡山県外</option>
+        </select>
       </div>
       <div>
         <label for="employees">従業員数(本人を除く)</label>

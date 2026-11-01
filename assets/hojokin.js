@@ -2,6 +2,7 @@
 (function() {
   var FIELDS = ['business_type', 'form', 'location', 'employees', 'business', 'plan', 'budget', 'timing'];
   var DEFAULT_LOCATION = '岡山県岡山市';
+  var OTHER = 'その他';
   var LEVEL_ORDER = { '国': 1, '県': 2, '市町村': 3, 'その他': 4 };
 
   var state = { candidates: [], selected: null, draft: null, sample: false };
@@ -18,13 +19,39 @@
   function readProfile() {
     var profile = {};
     FIELDS.forEach(function(key) { profile[key] = $(key).value.trim(); });
+    if (profile.business_type === OTHER) profile.business_type = $('business_type_other').value.trim() || OTHER;
     return profile;
+  }
+
+  function optionValues(select) {
+    return Array.prototype.map.call(select.options, function(o) { return o.value; }).filter(Boolean);
+  }
+
+  // 選択式の項目は、以前の自由入力の値(例: 飲食店(カフェ)、岡山県岡山市北区)も近い選択肢に合わせる
+  function setField(key, value) {
+    value = value || '';
+    if (key === 'business_type') {
+      var types = optionValues($('business_type'));
+      var match = types.filter(function(t) { return t !== OTHER && value.indexOf(t) === 0; })[0];
+      $('business_type').value = match || (value ? OTHER : '');
+      $('business_type_other').value = match ? '' : value;
+      toggleOtherType();
+    } else if (key === 'location') {
+      var places = optionValues($('location'));
+      var place = places.filter(function(p) { return value.indexOf(p) === 0; })[0];
+      $('location').value = place || (value && value.indexOf('岡山') === -1 ? '岡山県外' : DEFAULT_LOCATION);
+    } else {
+      $(key).value = value;
+    }
+  }
+
+  function toggleOtherType() {
+    $('business_type_other').hidden = $('business_type').value !== OTHER;
   }
 
   function fillProfile() {
     var profile = loadProfile();
-    FIELDS.forEach(function(key) { if (profile[key]) $(key).value = profile[key]; });
-    if (!$('location').value) $('location').value = DEFAULT_LOCATION;
+    FIELDS.forEach(function(key) { setField(key, profile[key]); });
   }
 
   function setStatus(el, message, isError, busy) {
@@ -82,7 +109,7 @@
   // 発表・説明用: 実際のAIで作った結果をすぐに表示する(入力内容は端末に保存しない)
   function showSample() {
     state.sample = true;
-    FIELDS.forEach(function(key) { $(key).value = HOJOKIN_SAMPLE.profile[key] || ''; });
+    FIELDS.forEach(function(key) { setField(key, HOJOKIN_SAMPLE.profile[key]); });
     $('saved-msg').hidden = true;
     state.candidates = HOJOKIN_SAMPLE.search.candidates.slice().sort(function(a, b) {
       return (LEVEL_ORDER[a.level] || 9) - (LEVEL_ORDER[b.level] || 9);
@@ -214,12 +241,15 @@
   // ---------- イベント ----------
   $('search-btn').addEventListener('click', search);
   $('sample-btn').addEventListener('click', showSample);
+  $('business_type').addEventListener('change', function() {
+    toggleOtherType();
+    if ($('business_type').value === OTHER) $('business_type_other').focus();
+  });
 
   // 支援者が次の事業者の相談に移るとき用
   $('clear-btn').addEventListener('click', function() {
     if (!confirm('入力内容と結果を消して、最初からやり直しますか？')) return;
-    FIELDS.forEach(function(key) { $(key).value = ''; });
-    $('location').value = DEFAULT_LOCATION;
+    FIELDS.forEach(function(key) { setField(key, ''); });
     try { localStorage.removeItem(PROFILE_KEY); } catch (e) { /* 保存なし */ }
     state = { candidates: [], selected: null, draft: null, sample: false };
     $('step2').hidden = true;
