@@ -4,7 +4,7 @@
   var DEFAULT_LOCATION = '岡山県岡山市';
   var LEVEL_ORDER = { '国': 1, '県': 2, '市町村': 3, 'その他': 4 };
 
-  var state = { candidates: [], selected: null, draft: null };
+  var state = { candidates: [], selected: null, draft: null, sample: false };
   var $ = function(id) { return document.getElementById(id); };
 
   // 進み具合の表示(1: 事業のこと / 2: 制度をえらぶ / 3: 下書き)
@@ -51,6 +51,7 @@
       return;
     }
     $('saved-msg').hidden = !saveProfile(profile);
+    state.sample = false;
 
     var btn = $('search-btn');
     btn.disabled = true;
@@ -60,13 +61,7 @@
       state.candidates = (data.candidates || []).slice().sort(function(a, b) {
         return (LEVEL_ORDER[a.level] || 9) - (LEVEL_ORDER[b.level] || 9);
       });
-      state.selected = null;
-      renderCandidates(data);
-      $('search-status').textContent = '';
-      $('step3').hidden = true;
-      $('step2').hidden = false;
-      setStep(2);
-      $('step2').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      showCandidates(data);
     } catch (e) {
       setStatus($('search-status'), e.message, true);
     } finally {
@@ -74,8 +69,35 @@
     }
   }
 
+  function showCandidates(data) {
+    state.selected = null;
+    renderCandidates(data);
+    $('search-status').textContent = '';
+    $('step3').hidden = true;
+    $('step2').hidden = false;
+    setStep(2);
+    $('step2').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // 発表・説明用: 実際のAIで作った結果をすぐに表示する(入力内容は端末に保存しない)
+  function showSample() {
+    state.sample = true;
+    FIELDS.forEach(function(key) { $(key).value = HOJOKIN_SAMPLE.profile[key] || ''; });
+    $('saved-msg').hidden = true;
+    state.candidates = HOJOKIN_SAMPLE.search.candidates.slice().sort(function(a, b) {
+      return (LEVEL_ORDER[a.level] || 9) - (LEVEL_ORDER[b.level] || 9);
+    });
+    showCandidates(HOJOKIN_SAMPLE.search);
+  }
+
+  function isSampleDraft(program, answers) {
+    return state.sample && !(answers && answers.length) && program.name.indexOf(HOJOKIN_SAMPLE.draft_program_keyword) !== -1;
+  }
+
   function renderCandidates(data) {
-    $('checked-at').textContent = state.candidates.length + '件 ・ 調べた日 ' + (data.checked_at || '');
+    $('checked-at').textContent = state.sample
+      ? 'サンプル: ' + HOJOKIN_SAMPLE.created_at + ' に実際のAIで作成した結果(カフェの例) ・ ' + state.candidates.length + '件'
+      : state.candidates.length + '件 ・ 調べた日 ' + (data.checked_at || '');
     if (!state.candidates.length) {
       $('candidates').innerHTML = '<p>合いそうな制度が見つかりませんでした。「やりたいこと」を具体的にして、もう一度お試しください。</p>';
     } else {
@@ -86,7 +108,7 @@
           : '<span class="unverified">公式ページは「' + escapeHtml(c.provider) + ' ' + escapeHtml(c.name) + '」で検索して確認してください</span>';
         return '<article class="program" data-index="' + i + '">'
           + '<div class="tags">'
-          + (isDemoMode() ? '<span class="tag sample">表示例</span>' : '')
+          + (isDemoMode() ? '<span class="tag sample">表示例</span>' : state.sample ? '<span class="tag sample">サンプル</span>' : '')
           + '<span class="tag">' + escapeHtml(c.level) + '</span>'
           + '<span class="tag">' + escapeHtml(c.kind) + '</span>'
           + '<span class="tag' + (c.status === '公募中' ? ' open' : '') + '">' + escapeHtml(c.status) + '</span>'
@@ -121,7 +143,12 @@
     setStatus($('draft-status'), '公募要領を確認しながら下書きを作っています。2分ほどかかることがあります…', false, true);
     setDraftButtonsDisabled(true);
     try {
-      state.draft = await request({ mode: 'draft', profile: readProfile(), program: program, answers: answers || [] });
+      if (isSampleDraft(program, answers)) {
+        await wait(600);
+        state.draft = HOJOKIN_SAMPLE.draft;
+      } else {
+        state.draft = await request({ mode: 'draft', profile: readProfile(), program: program, answers: answers || [] });
+      }
       $('draft-status').textContent = '';
       renderDraft(state.draft);
     } catch (e) {
@@ -141,7 +168,8 @@
 
   function renderDraft(d) {
     var sources = (d.sources || []).map(safeUrl).filter(Boolean);
-    var html = (isDemoMode() ? '<div class="tags"><span class="tag sample">表示例</span></div>' : '')
+    var html = (isDemoMode() ? '<div class="tags"><span class="tag sample">表示例</span></div>'
+        : state.sample && d === HOJOKIN_SAMPLE.draft ? '<div class="tags"><span class="tag sample">サンプル</span></div>' : '')
       + '<h3>' + escapeHtml(d.title) + '</h3>'
       + d.sections.map(function(s) {
         return '<div class="draft-section"><h3>' + escapeHtml(s.heading) + '</h3><div class="draft-body">' + highlightPlaceholders(s.body) + '</div></div>';
@@ -185,6 +213,7 @@
 
   // ---------- イベント ----------
   $('search-btn').addEventListener('click', search);
+  $('sample-btn').addEventListener('click', showSample);
 
   // 支援者が次の事業者の相談に移るとき用
   $('clear-btn').addEventListener('click', function() {
@@ -192,7 +221,7 @@
     FIELDS.forEach(function(key) { $(key).value = ''; });
     $('location').value = DEFAULT_LOCATION;
     try { localStorage.removeItem(PROFILE_KEY); } catch (e) { /* 保存なし */ }
-    state = { candidates: [], selected: null, draft: null };
+    state = { candidates: [], selected: null, draft: null, sample: false };
     $('step2').hidden = true;
     $('step3').hidden = true;
     setStep(1);
