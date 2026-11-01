@@ -3,6 +3,22 @@
   var FIELDS = ['business_type', 'form', 'location', 'employees', 'business', 'plan', 'budget', 'timing'];
   var DEFAULT_LOCATION = '岡山県岡山市';
   var OTHER = 'その他';
+  var CHIP_FIELDS = ['goals', 'spend'];
+
+  // 業種ごとの「ひとこと補足」の例文
+  var PLAN_EXAMPLES = {
+    '飲食店': 'お土産の焼き菓子をネットで売りたい。包装に時間がかかっている。',
+    '小売業(店舗)': '店頭だけでなくネットでも売りたい。在庫管理を手作業でしている。',
+    'ネット通販・EC': '自社サイトの集客を強化したい。受注処理を自動化したい。',
+    '食品製造(菓子・加工品など)': '新しい加工品を開発して県外へ販路を広げたい。',
+    '製造業(食品以外)': '古い機械を入れ替えて生産性を上げたい。',
+    '建設業・工務店': '見積や現場管理をデジタル化して残業を減らしたい。',
+    '宿泊業・観光': 'インバウンド向けに予約サイトと多言語対応を整えたい。',
+    '美容・理容・エステ': '予約システムを入れて、新規客をネットから集めたい。',
+    '医療・福祉・介護': '記録業務をタブレット化して職員の負担を減らしたい。',
+    '農業・林業・漁業': '規格外の農産物を加工して直販したい。',
+    'IT・情報通信・Web制作': '新サービスを開発するため人を採用したい。'
+  };
   var LEVEL_ORDER = { '国': 1, '県': 2, '市町村': 3, 'その他': 4 };
 
   var state = { candidates: [], selected: null, draft: null, sample: false };
@@ -20,7 +36,38 @@
     var profile = {};
     FIELDS.forEach(function(key) { profile[key] = $(key).value.trim(); });
     if (profile.business_type === OTHER) profile.business_type = $('business_type_other').value.trim() || OTHER;
+    CHIP_FIELDS.forEach(function(key) { profile[key] = selectedChips(key).map(function(b) { return b.dataset.value; }); });
     return profile;
+  }
+
+  function selectedChips(key) {
+    return Array.prototype.slice.call(document.querySelectorAll('#' + key + ' .chip[aria-pressed="true"]'));
+  }
+
+  // Worker へ送る形: 選択内容に制度の種類のヒントを添えて「やりたいこと」の文章にまとめる
+  function toRequestProfile(profile) {
+    var out = {};
+    FIELDS.forEach(function(key) { out[key] = profile[key]; });
+    var label = function(b) { return b.dataset.value + '(' + b.dataset.hint + ')'; };
+    var parts = [];
+    var goals = selectedChips('goals').map(label);
+    var spend = selectedChips('spend').map(label);
+    if (goals.length) parts.push('やりたいこと: ' + goals.join('、'));
+    if (spend.length) parts.push('お金を使う予定のもの: ' + spend.join('、'));
+    if (profile.plan) parts.push('補足: ' + profile.plan);
+    out.plan = parts.join('\n');
+    return out;
+  }
+
+  function setChips(key, values) {
+    values = Array.isArray(values) ? values : [];
+    document.querySelectorAll('#' + key + ' .chip').forEach(function(b) {
+      b.setAttribute('aria-pressed', values.indexOf(b.dataset.value) !== -1 ? 'true' : 'false');
+    });
+  }
+
+  function updatePlanExample() {
+    $('plan').placeholder = '例: ' + (PLAN_EXAMPLES[$('business_type').value] || PLAN_EXAMPLES['飲食店']);
   }
 
   function optionValues(select) {
@@ -36,6 +83,7 @@
       $('business_type').value = match || (value ? OTHER : '');
       $('business_type_other').value = match ? '' : value;
       toggleOtherType();
+      updatePlanExample();
     } else if (key === 'location') {
       var places = optionValues($('location'));
       var place = places.filter(function(p) { return value.indexOf(p) === 0; })[0];
@@ -52,6 +100,7 @@
   function fillProfile() {
     var profile = loadProfile();
     FIELDS.forEach(function(key) { setField(key, profile[key]); });
+    CHIP_FIELDS.forEach(function(key) { setChips(key, profile[key]); });
   }
 
   function setStatus(el, message, isError, busy) {
@@ -72,8 +121,8 @@
   // ---------- STEP 2: 制度候補 ----------
   async function search() {
     var profile = readProfile();
-    if (!profile.business && !profile.plan) {
-      setStatus($('search-status'), '「事業内容」か「やりたいこと」を入力してください。', true);
+    if (!profile.business && !profile.plan && !profile.goals.length) {
+      setStatus($('search-status'), '「事業内容」を入力するか、「やりたいこと」を1つ以上選んでください。', true);
       $('business').focus();
       return;
     }
@@ -84,7 +133,7 @@
     btn.disabled = true;
     setStatus($('search-status'), '公式サイトを調べています。1〜2分ほどかかります…', false, true);
     try {
-      var data = await request({ mode: 'search', profile: profile });
+      var data = await request({ mode: 'search', profile: toRequestProfile(profile) });
       state.candidates = (data.candidates || []).slice().sort(function(a, b) {
         return (LEVEL_ORDER[a.level] || 9) - (LEVEL_ORDER[b.level] || 9);
       });
@@ -110,6 +159,7 @@
   function showSample() {
     state.sample = true;
     FIELDS.forEach(function(key) { setField(key, HOJOKIN_SAMPLE.profile[key]); });
+    CHIP_FIELDS.forEach(function(key) { setChips(key, HOJOKIN_SAMPLE.profile[key]); });
     $('saved-msg').hidden = true;
     state.candidates = HOJOKIN_SAMPLE.search.candidates.slice().sort(function(a, b) {
       return (LEVEL_ORDER[a.level] || 9) - (LEVEL_ORDER[b.level] || 9);
@@ -174,7 +224,7 @@
         await wait(600);
         state.draft = HOJOKIN_SAMPLE.draft;
       } else {
-        state.draft = await request({ mode: 'draft', profile: readProfile(), program: program, answers: answers || [] });
+        state.draft = await request({ mode: 'draft', profile: toRequestProfile(readProfile()), program: program, answers: answers || [] });
       }
       $('draft-status').textContent = '';
       renderDraft(state.draft);
@@ -241,8 +291,15 @@
   // ---------- イベント ----------
   $('search-btn').addEventListener('click', search);
   $('sample-btn').addEventListener('click', showSample);
+  CHIP_FIELDS.forEach(function(key) {
+    $(key).addEventListener('click', function(e) {
+      var chip = e.target.closest('.chip');
+      if (chip) chip.setAttribute('aria-pressed', chip.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+    });
+  });
   $('business_type').addEventListener('change', function() {
     toggleOtherType();
+    updatePlanExample();
     if ($('business_type').value === OTHER) $('business_type_other').focus();
   });
 
@@ -250,6 +307,7 @@
   $('clear-btn').addEventListener('click', function() {
     if (!confirm('入力内容と結果を消して、最初からやり直しますか？')) return;
     FIELDS.forEach(function(key) { setField(key, ''); });
+    CHIP_FIELDS.forEach(function(key) { setChips(key, []); });
     try { localStorage.removeItem(PROFILE_KEY); } catch (e) { /* 保存なし */ }
     state = { candidates: [], selected: null, draft: null, sample: false };
     $('step2').hidden = true;

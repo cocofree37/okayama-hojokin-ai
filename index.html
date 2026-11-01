@@ -126,9 +126,37 @@
         <textarea id="business" name="business" placeholder="例: 岡山駅近くで、地元の白桃やマスカットを使ったスイーツと珈琲のカフェを経営。客席20席、売上の8割が店内飲食。"></textarea>
       </div>
       <div class="full">
-        <label for="plan">やりたいこと・投資の予定</label>
-        <textarea id="plan" name="plan" placeholder="例: 焼き菓子のネット販売を始めたい。ECサイトの制作と、包装機の購入を考えている。"></textarea>
-        <p class="hint">「何に、なぜお金を使いたいか」が具体的なほど、合う制度が見つかりやすくなります。</p>
+        <span class="label" id="goals-label">やりたいこと(いくつでも)</span>
+        <div class="chips" id="goals" role="group" aria-labelledby="goals-label">
+          <button type="button" class="chip" aria-pressed="false" data-value="新しいお客さんを増やしたい" data-hint="販路開拓">新しいお客さんを増やしたい</button>
+          <button type="button" class="chip" aria-pressed="false" data-value="ネット販売を始めたい" data-hint="EC・販路開拓">ネット販売を始めたい</button>
+          <button type="button" class="chip" aria-pressed="false" data-value="新商品・サービスを作りたい" data-hint="新商品開発・新事業">新商品・サービスを作りたい</button>
+          <button type="button" class="chip" aria-pressed="false" data-value="作業を楽にしたい・人手不足" data-hint="省力化・業務効率化">作業を楽にしたい・人手不足</button>
+          <button type="button" class="chip" aria-pressed="false" data-value="店を改装・新しく出したい" data-hint="店舗改装・設備投資">店を改装・新しく出したい</button>
+          <button type="button" class="chip" aria-pressed="false" data-value="人を雇う・育てる" data-hint="雇用・人材育成">人を雇う・育てる</button>
+          <button type="button" class="chip" aria-pressed="false" data-value="給料を上げたい" data-hint="賃上げ">給料を上げたい</button>
+          <button type="button" class="chip" aria-pressed="false" data-value="これから開業する" data-hint="創業">これから開業する</button>
+          <button type="button" class="chip" aria-pressed="false" data-value="事業を引き継ぐ" data-hint="事業承継">事業を引き継ぐ</button>
+          <button type="button" class="chip" aria-pressed="false" data-value="省エネ・光熱費を下げたい" data-hint="省エネ">省エネ・光熱費を下げたい</button>
+        </div>
+      </div>
+      <div class="full">
+        <span class="label" id="spend-label">お金を使う予定のもの(いくつでも)</span>
+        <div class="chips" id="spend" role="group" aria-labelledby="spend-label">
+          <button type="button" class="chip" aria-pressed="false" data-value="ホームページ・ネットショップ" data-hint="ウェブサイト関連費">ホームページ・ネットショップ</button>
+          <button type="button" class="chip" aria-pressed="false" data-value="機械・設備" data-hint="機械装置等費">機械・設備</button>
+          <button type="button" class="chip" aria-pressed="false" data-value="パソコン・ソフト・システム" data-hint="ITツール">パソコン・ソフト・システム</button>
+          <button type="button" class="chip" aria-pressed="false" data-value="チラシ・広告" data-hint="広報費">チラシ・広告</button>
+          <button type="button" class="chip" aria-pressed="false" data-value="店舗の工事" data-hint="改装・工事費">店舗の工事</button>
+          <button type="button" class="chip" aria-pressed="false" data-value="研修・人件費" data-hint="人材育成・人件費">研修・人件費</button>
+          <button type="button" class="chip" aria-pressed="false" data-value="専門家・外注" data-hint="専門家経費・外注費">専門家・外注</button>
+          <button type="button" class="chip" aria-pressed="false" data-value="まだ決めていない" data-hint="未定">まだ決めていない</button>
+        </div>
+      </div>
+      <div class="full">
+        <label for="plan">ひとこと補足(任意)</label>
+        <textarea id="plan" name="plan" rows="2" placeholder="例: お土産の焼き菓子をネットで売りたい。包装に時間がかかっている。"></textarea>
+        <p class="hint">「何に、なぜお金を使いたいか」を一言加えると、合う制度が見つかりやすくなります。</p>
       </div>
       <div>
         <label for="budget">予定金額(だいたいで可)</label>

@@ -151,3 +151,15 @@ ul.plain li { margin-bottom: 0.3rem; }
   .stepper li::before { content: '0' counter(step) ' '; }
   .card { border-left: none; border-right: none; margin-left: -20px; margin-right: -20px; }
 }
+
+/* ---------- 選択ボタン(やりたいこと・お金を使う予定) ---------- */
+.label { display: block; font-weight: 500; font-size: 13px; margin-bottom: 0.6rem; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+button.chip {
+  font-size: 13px; font-weight: 400; letter-spacing: 0.03em; padding: 0.45rem 0.9rem;
+  background: #fff; color: var(--ink); border: 1px solid #bdbdbd; border-radius: 0;
+}
+button.chip:hover { background: #fff; border-color: var(--ink); color: var(--ink); }
+button.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+button.chip[aria-pressed="true"]::before { content: '✓ '; }
+#plan { min-height: 3.5rem; }
